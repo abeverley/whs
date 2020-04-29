@@ -5,19 +5,27 @@
 {% set codeinjection_foot = post.codeinjection_foot %}
 
 {% block content %}
+
+    <div class="row justify-content-center">
+<div class="col-lg-9">
+
+
     <article class="content">
         {% if post.feature_image %}
-            <figure class="post-feature-image">
+            <!-- <figure class="post-feature-image">
                 <img src="{{ post.feature_image }}" alt="{{ title }}">
-            </figure>
+            </figure>  -->
         {% endif %}
         <section class="post-full-content">
             <h1 class="content-title">{{ title }}</h1>
-            <section class="content-body load-external-scripts">
+            <section class="content-body load-external-scripts {% if page.url == '/who-are-we/' %}small-img{% endif %}">
                 {{ content | safe }}
             </section>
         </section>
     </article>
+
+</div>
+</div>
 {% endblock %}
 
 {%- block seo -%}

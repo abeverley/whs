@@ -1,0 +1,35 @@
+{% extends 'layouts/default.njk' %}
+
+{% set title = "Report a problem" %}
+
+{% block content %}
+
+        <h1>The good, the bad and the ugly</h1>
+        <p>Add a point to the map to either:</p>
+        <ul>
+            <li>Report a problem that prevents people practising social distancing or exercising safely</p>
+            <li>Highlight something that is working well</p>
+        </ul>
+
+        <div id="mapid" style="width: 100%; height: calc(100vh - 200px);"></div>
+        </div>
+
+<div class="modal fade" id="modal-image" tabindex="-1" role="dialog" aria-labelledby="modal-image-label" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-image-label">View uploaded image</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img width="100%">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock%}

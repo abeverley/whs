@@ -1,6 +1,6 @@
 ---
 pagination:
-  data: collections.posts
+  data: collections.health
   size: 9
   alias: posts
 ---
@@ -8,11 +8,11 @@ pagination:
 {% extends 'layouts/default.njk' %}
 {% from "partials/card.njk" import card %}
 
-{% set title = "Home" %}
+{% set title = "Health" %}
 
 {% block content %}
     <div class="row">
-        {% for post in collections.home %}
+        {% for post in collections.health %}
             {{ card(post) }}
         {% endfor %}
     </div>

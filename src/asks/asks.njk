@@ -1,6 +1,6 @@
 ---
 pagination:
-  data: collections.posts
+  data: collections.asks
   size: 9
   alias: posts
 ---
@@ -8,11 +8,13 @@ pagination:
 {% extends 'layouts/default.njk' %}
 {% from "partials/card.njk" import card %}
 
-{% set title = "Home" %}
+{% set title = "Traffic" %}
 
 {% block content %}
+    <h1>Our Asks</h1>
+    <img src="/images/whs-logo3.svg" class="kg-image">
     <div class="row">
-        {% for post in collections.home %}
+        {% for post in collections.asks %}
             {{ card(post) }}
         {% endfor %}
     </div>

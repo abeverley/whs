@@ -1,38 +1,39 @@
-{% from "partials/icon.njk" import icon %}
+<nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background-color:#28b828">
+    <a class="navbar-brand" href="/">
+        <img src="/images/whs-logo3.svg" style="height:30px">
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+        aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-<header class="site-head"{% if site.cover_image %} style="background-image: url('{{ site.cover_image }}')"{% endif %}>
-    <div class="container">
-        <div class="site-mast">
-            {% if site.logo %}
-                <div class="site-mast-left">
-                    <a {% if page.url == "/" %}aria-current="page"{% endif %} href="{{ site.url }}">
-                        <img class="site-logo" src="{{ site.logo }}" alt="{{ site.title }}">
-                    </a>
-                </div>
-            {% endif %}
-            <div class="site-mast-right">
-                {% if site.twitter %}
-                    <a href="https://twitter.com/{{ site.twitter | replace("@", "") }}" class="site-nav-item" target="_blank" rel="noopener noreferrer">
-                        {{ icon({ id: 'twitter' }) }}
-                    </a>
-                {% endif %}
-                {% if site.facebook %}
-                    <a href="https://www.facebook.com/{{ site.facebook }}" class="site-nav-item" target="_blank" rel="noopener noreferrer">
-                        {{ icon({ id: 'facebook' }) }}
-                    </a>
-                {% endif %}
-                <a class="site-nav-item" href="https://feedly.com/i/subscription/feed/{{ site.url }}/rss/" target="_blank" rel="noopener noreferrer">
-                    {{ icon({ id: 'rss' }) }}
-                </a>
-            </div>
-        </div>
-        {% if page.url == '/' %}
-            <div class="site-banner">
-                <h1 class="site-banner-title">{{ site.title }}</h1>
-                <p class="site-banner-desc">{{ site.description }}</p>
-            </div>
-        {% endif %}
-
-        {% include 'partials/navigation.njk' %}
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/asks">Asks</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/pollution">Pollution</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/health">Health</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/traffic">Traffic</a>
+            </li>
+            <!--<li class="nav-item active">
+                <a class="nav-link" href="/events">Events</a>
+            </li>-->
+            <li class="nav-item active">
+                <a class="nav-link" href="/who-are-we">About</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/join">Join</a>
+            </li>
+        </ul>
     </div>
-</header>
+</nav>
+

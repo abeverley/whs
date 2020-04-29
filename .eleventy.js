@@ -10,6 +10,7 @@ const ghostContentAPI = require("@tryghost/content-api");
 const htmlMinTransform = require("./src/transforms/html-min-transform.js");
 
 // Init Ghost API
+// For use and filtering see https://ghost.org/docs/api/v3/javascript/filtering/
 const api = new ghostContentAPI({
   url: process.env.GHOST_API_URL,
   key: process.env.GHOST_CONTENT_API_KEY,
@@ -22,6 +23,13 @@ const stripDomain = url => {
 };
 
 module.exports = function(config) {
+
+  // Copy `img/` to `_site/img`
+  config.addPassthroughCopy("images");
+  config.addPassthroughCopy("js");
+  config.addPassthroughCopy("css");
+  config.addPassthroughCopy("cgi-bin");
+
   // Minify HTML
   config.addTransform("htmlmin", htmlMinTransform);
 
@@ -85,11 +93,13 @@ module.exports = function(config) {
     return collection;
   });
 
-  // Get all posts
-  config.addCollection("posts", async function(collection) {
+
+  // Home
+  config.addCollection("home", async function(collection) {
     collection = await api.posts
       .browse({
         include: "tags,authors",
+          filter: "tag:home",
         limit: "all"
       })
       .catch(err => {
@@ -104,6 +114,223 @@ module.exports = function(config) {
       // Convert publish date into a Date object
       post.published_at = new Date(post.published_at);
     });
+
+    // Bring featured post to the top of the list
+    collection.sort((post, nextPost) => nextPost.featured - post.featured);
+
+    return collection;
+  });
+
+  // About
+  config.addCollection("about", async function(collection) {
+    collection = await api.posts
+      .browse({
+        include: "tags,authors",
+          filter: "tag:about",
+        limit: "all"
+      })
+      .catch(err => {
+        console.error(err);
+      });
+
+    collection.forEach(post => {
+      post.url = stripDomain(post.url);
+      post.primary_author.url = stripDomain(post.primary_author.url);
+      post.tags.map(tag => (tag.url = stripDomain(tag.url)));
+
+      // Convert publish date into a Date object
+      post.published_at = new Date(post.published_at);
+    });
+
+    // Bring featured post to the top of the list
+    collection.sort((post, nextPost) => nextPost.featured - post.featured);
+
+    return collection;
+  });
+
+  // Events
+  config.addCollection("events", async function(collection) {
+    collection = await api.posts
+      .browse({
+        include: "tags,authors",
+          filter: "tag:events",
+        limit: "all"
+      })
+      .catch(err => {
+        console.error(err);
+      });
+
+    collection.forEach(post => {
+      post.url = stripDomain(post.url);
+      post.primary_author.url = stripDomain(post.primary_author.url);
+      post.tags.map(tag => (tag.url = stripDomain(tag.url)));
+
+      // Convert publish date into a Date object
+      post.published_at = new Date(post.published_at);
+    });
+
+    // Bring featured post to the top of the list
+    collection.sort((post, nextPost) => nextPost.featured - post.featured);
+
+    return collection;
+  });
+
+  // health
+  config.addCollection("health", async function(collection) {
+    collection = await api.posts
+      .browse({
+        include: "tags,authors",
+          filter: "tag:health",
+        limit: "all"
+      })
+      .catch(err => {
+        console.error(err);
+      });
+
+    collection.forEach(post => {
+      post.url = stripDomain(post.url);
+      post.primary_author.url = stripDomain(post.primary_author.url);
+      post.tags.map(tag => (tag.url = stripDomain(tag.url)));
+
+      // Convert publish date into a Date object
+      post.published_at = new Date(post.published_at);
+    });
+
+    // Bring featured post to the top of the list
+    collection.sort((post, nextPost) => nextPost.featured - post.featured);
+
+    return collection;
+  });
+
+  // news
+  config.addCollection("news", async function(collection) {
+    collection = await api.posts
+      .browse({
+        include: "tags,authors",
+          filter: "tag:news",
+        limit: "all"
+      })
+      .catch(err => {
+        console.error(err);
+      });
+
+    collection.forEach(post => {
+      post.url = stripDomain(post.url);
+      post.primary_author.url = stripDomain(post.primary_author.url);
+      post.tags.map(tag => (tag.url = stripDomain(tag.url)));
+
+      // Convert publish date into a Date object
+      post.published_at = new Date(post.published_at);
+    });
+
+    // Bring featured post to the top of the list
+    collection.sort((post, nextPost) => nextPost.featured - post.featured);
+
+    return collection;
+  });
+
+  // pollution
+  config.addCollection("pollution", async function(collection) {
+    collection = await api.posts
+      .browse({
+        include: "tags,authors",
+          filter: "tag:pollution",
+        limit: "all"
+      })
+      .catch(err => {
+        console.error(err);
+      });
+
+    collection.forEach(post => {
+      post.url = stripDomain(post.url);
+      post.primary_author.url = stripDomain(post.primary_author.url);
+      post.tags.map(tag => (tag.url = stripDomain(tag.url)));
+
+      // Convert publish date into a Date object
+      post.published_at = new Date(post.published_at);
+    });
+
+    // Bring featured post to the top of the list
+    collection.sort((post, nextPost) => nextPost.featured - post.featured);
+
+    return collection;
+  });
+
+  // asks
+  config.addCollection("asks", async function(collection) {
+    collection = await api.posts
+      .browse({
+        include: "tags,authors",
+          filter: "tag:asks",
+        limit: "all"
+      })
+      .catch(err => {
+        console.error(err);
+      });
+
+    collection.forEach(post => {
+      post.url = stripDomain(post.url);
+      post.primary_author.url = stripDomain(post.primary_author.url);
+      post.tags.map(tag => (tag.url = stripDomain(tag.url)));
+
+      // Convert publish date into a Date object
+      post.published_at = new Date(post.published_at);
+    });
+
+    // Bring featured post to the top of the list
+    collection.sort((post, nextPost) => nextPost.featured - post.featured);
+
+    return collection;
+  });
+
+  // traffic
+  config.addCollection("traffic", async function(collection) {
+    collection = await api.posts
+      .browse({
+        include: "tags,authors",
+          filter: "tag:traffic",
+        limit: "all"
+      })
+      .catch(err => {
+        console.error(err);
+      });
+
+    collection.forEach(post => {
+      post.url = stripDomain(post.url);
+      post.primary_author.url = stripDomain(post.primary_author.url);
+      post.tags.map(tag => (tag.url = stripDomain(tag.url)));
+
+      // Convert publish date into a Date object
+      post.published_at = new Date(post.published_at);
+    });
+
+    // Bring featured post to the top of the list
+    collection.sort((post, nextPost) => nextPost.featured - post.featured);
+
+    return collection;
+  });
+
+  // Get all posts
+  config.addCollection("posts", async function(collection) {
+    collection = await api.posts
+      .browse({
+        include: "tags,authors",
+        filter: "tag:-hash-exclude", // Do not write content for excluded posts
+        limit: "all"
+      })
+      .catch(err => {
+        console.error(err);
+      });
+
+    collection.forEach(post => {
+      post.url = stripDomain(post.url);
+      post.primary_author.url = stripDomain(post.primary_author.url);
+      post.tags.map(tag => (tag.url = stripDomain(tag.url)));
+
+      // Convert publish date into a Date object
+      post.published_at = new Date(post.published_at);
+    });
+      console.log(collection);
 
     // Bring featured post to the top of the list
     collection.sort((post, nextPost) => nextPost.featured - post.featured);
