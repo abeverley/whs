@@ -20,6 +20,7 @@ function onEachFeature(feature, layer) {
             id:               feature.properties.id,
             has_image:        feature.properties.has_image,
             html:             feature.properties.html,
+            subject:          feature.properties.subject,
             thumbnail_width:  feature.properties.thumbnail_width,
             thumbnail_height: feature.properties.thumbnail_height
         };
@@ -47,18 +48,34 @@ fetch("/traffic-json/points")
         }
     });
 
+var subjects;
+fetch("/traffic-json/subjects")
+    .then(function(response) { return response.json() })
+    .then(function(json) {
+        subjects = json;
+    });
 
 var popup = L.popup();
 
 function onMapClick(e) {
-        var pop = L.popup({minWidth: 300})
-            .setLatLng(e.latlng)
-            .setContent('<h5>Add comment</h5><form method="post"><div class="form-group"><textarea name="comment" rows="5" class="form-control"></textarea></div>'
+        var content = '<h5>Add comment</h5>'
+                + '<form method="post">'
+                + '<div class="form-group">'
+                + '<select class="form-control" id="subject_id" name="subject_id">'
+                + '<option value=""></option>';
+        subjects.forEach(function (item, index){
+            content = content + '<option value="' + item.id + '">' + item.title + '</option>';
+        });
+        content = content + '</select></div>'
+                + '<div class="form-group"><textarea name="comment" rows="5" class="form-control"></textarea></div>'
                 + '<input class="lat" type="hidden" name="lat" value="' + e.latlng.lat + '">'
                 + '<input class="long" type="hidden" name="long" value="' + e.latlng.lng + '">'
                 + '<div class="form-group"><label for="photo">Photo (optional)</label><input type="file" name="file" class="form-control-file" id="photo"></div>'
                 + '<div class="alert alert-danger error-message" role="alert" style="display:none"></span></div>'
-                + '<div class="d-flex justify-content-end"><button type="submit" class="btn btn-primary trigger">Submit</button></div></form>')
+                + '<div class="d-flex justify-content-end"><button type="submit" class="btn btn-primary trigger">Submit</button></div></form>';
+        var pop = L.popup({minWidth: 300})
+            .setLatLng(e.latlng)
+            .setContent(content)
             .openOn(mymap);
 }
 
@@ -68,6 +85,9 @@ var marker_popup = function (e, point) {
     var popup = e.target.getPopup();
     popup.setContent(function(ef){
         var $element = $('<div><p>'+point.html+'</p></div>');
+        if (point.subject) {
+            $element.prepend('<h6>' + point.subject + '</h6>');
+        }
         if (point.has_image) {
             $element.find('.loading').show();
             var $image_link = $('<a href="#" data-toggle="modal" data-target="#modal-image"></a>');
