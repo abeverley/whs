@@ -34,6 +34,15 @@
                 <a class="nav-link" href="/join">Join</a>
             </li>
         </ul>
+        <div class="navbar-nav ml-auto">
+            <div class="social-links">
+                {% if site.twitter %}
+                    <a href="https://twitter.com/{{ site.twitter | replace("@", "") }}" class="site-nav-item" target="_blank" rel="noopener noreferrer">
+                        {{ icon({ id: 'twitter' }) }}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </nav>
 
