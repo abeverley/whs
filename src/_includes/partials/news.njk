@@ -1,0 +1,10 @@
+{% macro card_news(post) %}
+      <div class="col-md-4 d-flex flex-column">
+        <a href="{{ post.canonical_url }}" role="button">
+            <img class="card-img-top" src="{{ post.feature_image }}" style="height:200px;object-fit:cover">
+        </a>
+        <h2 class="mt-2">{{ post.title }}</h2>
+        <p>{{ post.excerpt }}</p>
+        <p><a class="btn btn-secondary" href="{{ post.url }}" role="button">Read more &raquo;</a></p>
+      </div>
+{% endmacro %}
