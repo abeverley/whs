@@ -130,5 +130,7 @@ $('#modal-image').on('show.bs.modal', function (event) {
     var link = $(event.relatedTarget);
     var point_id = link.find('img').data('point-id');
     var modal = $(this);
-    modal.find('.modal-body img').attr('src', '/traffic-json/image/' + point_id);
+    modal.find('.modal-body img').remove();
+    var $img = $('<img width="100%">').attr('src', '/traffic-json/image/' + point_id);
+    modal.find('.modal-body').empty().append($img);
 })
