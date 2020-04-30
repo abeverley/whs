@@ -49,6 +49,10 @@ figcaption {
 .marker-cluster span { color: white; }
 .marker-cluster-small { background-color: rgb(66, 135, 245, 0.5); }
 
+.social-link svg {
+    height: 1.8rem;
+    fill: white;
+}
 
 .container {
   display: grid;
