@@ -62,7 +62,7 @@ function onMapClick(e) {
                 + '<form method="post">'
                 + '<div class="form-group">'
                 + '<select class="form-control" id="subject_id" name="subject_id">'
-                + '<option value=""></option>';
+                + '<option value="" disabled selected>&lt;select category&gt;</option>';
         subjects.forEach(function (item, index){
             content = content + '<option value="' + item.id + '">' + item.title + '</option>';
         });
