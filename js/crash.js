@@ -48,6 +48,19 @@ fetch("/traffic-json/points")
         }
     });
 
+fetch("/traffic-json/outline")
+    .then(function(response) { return response.json() })
+    .then(function(json) {
+        var geoJsonLayer = L.geoJSON([json], {
+
+            style: function (feature) {
+                return {
+                    fill: false
+                };
+            },
+        }).addTo(mymap);
+    });
+
 var subjects;
 fetch("/traffic-json/subjects")
     .then(function(response) { return response.json() })
