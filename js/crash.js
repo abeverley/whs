@@ -13,6 +13,8 @@ var getUrlParameter = function getUrlParameter(sParam) {
     }
 };
 
+var is_record = window.location.href.search("westminster-temporary-traffic-measures") > 0;
+
 var mymap = L.map('mapid').setView([51.505, -0.147], 15);
 
 
@@ -43,105 +45,13 @@ function onEachFeature(feature, layer) {
     });
 }
 
-var layers = {
-    clwn: {
-        name: "Central London Walking Network",
-        url: "/traffic-json/clwn",
-        fill: false,
-        color: '#0f702a'
-    },
-    ltn: {
-        name: "Suggested Low Traffic Neighbourhoods",
-        url: "/traffic-json/ltn",
-        fill: true,
-        color: '#beb71c'
-    },
-    improved: {
-        name: "Existing cycleways improved with Low Traffic Neighbourhood",
-        url: "/traffic-json/ltn",
-        fill: false,
-        color: '#1843bc'
-    },
-    lightseg: {
-        name: "Suggested lightly segregated cycle routes",
-        url: "/traffic-json/lightseg",
-        fill: false,
-        color: '#a81d1d'
-    },
-    wards: {
-        name: "Borough wards",
-        url: "/traffic-json/wards",
-        fill: true,
-        color: '#7e9cf2'
-    }
-};
+if (!is_record) { setup_layers(); }
 
-Object.keys(layers).forEach(function(layer_name){
-
-    var check = $('<div class="form-check"><input type="checkbox" class="layerswitch form-check-input" id="'+layer_name+'"><label class="form-check-label" for="'+layer_name+'">'+layers[layer_name]["name"]+'</label></div>');
-    $('#mapid').before(check);
-    layers[layer_name]["checkbox"] = $('#'+layer_name, check).change(function() {
-        if(this.checked) {
-            toggle_layer(layer_name, true);
-        } else {
-            toggle_layer(layer_name, false);
-        }
-    });
-})
-
-var toggle_layer = function (layer_name, show) {
-    if (show) {
-        if (!layers[layer_name]["leaflet"]) {
-            fetch('/traffic-json/' + layer_name)
-                .then(function(response) { return response.json() })
-                .then(function(json) {
-                    layers[layer_name]["leaflet"] = L.geoJSON(json, {
-
-                        style: function (feature) {
-                            return {
-                                fill: layers[layer_name]["fill"],
-                                color: layers[layer_name]["color"]
-                            };
-                        },
-                    }).addTo(mymap);
-                });
-        } else {
-            layers[layer_name]["leaflet"].addTo(mymap);
-        }
-    } else {
-        layers[layer_name]["leaflet"].remove();
-    }
-}
-
-if (getUrlParameter('clwn')) {
-    toggle_layer('clwn', 1);
-    layers['clwn']["checkbox"].attr('checked', true);
-}
-
-if (getUrlParameter('improved')) {
-    toggle_layer('improved', 1);
-    layers['improved']["checkbox"].attr('checked', true);
-}
-
-if (getUrlParameter('lightseg')) {
-    toggle_layer('lightseg', 1);
-    layers['lightseg']["checkbox"].attr('checked', true);
-}
-
-if (getUrlParameter('ltn')) {
-    toggle_layer('ltn', 1);
-    layers['ltn']["checkbox"].attr('checked', true);
-}
-
-if (getUrlParameter('wards')) {
-    toggle_layer('wards', 1);
-    layers['wards']["checkbox"].attr('checked', true);
-}
 
 var markers = L.markerClusterGroup({
 });
 
-fetch("/traffic-json/points")
+fetch("/traffic-json/points?is_record=" + is_record)
     .then(function(response) { return response.json() })
     .then(function(json) {
         var geoJsonLayer = L.geoJSON([json], {
@@ -201,6 +111,7 @@ var popup = L.popup();
 function onMapClick(e) {
         var content = '<h5>Add comment</h5>'
                 + '<form method="post">'
+                + '<input type="hidden" name="is_record" value="' + is_record + '">'
                 + '<div class="form-group">'
                 + '<select class="form-control" id="subject_id" name="subject_id">'
                 + '<option value="" disabled selected>&lt;select category&gt;</option>';
@@ -220,7 +131,7 @@ function onMapClick(e) {
             .openOn(mymap);
 }
 
-mymap.on('click', onMapClick);
+if (is_record) { mymap.on('click', onMapClick); }
 
 var marker_popup = function (e, point) {
     var popup = e.target.getPopup();
@@ -295,3 +206,101 @@ $('#modal-image').on('show.bs.modal', function (event) {
     var $img = $('<img width="100%">').attr('src', '/traffic-json/image/' + point_id);
     modal.find('.modal-body').empty().append($img);
 })
+
+function setup_layers() {
+
+    var layers = {
+        clwn: {
+            name: "Central London Walking Network",
+            url: "/traffic-json/clwn",
+            fill: false,
+            color: '#0f702a'
+        },
+        ltn: {
+            name: "Suggested Low Traffic Neighbourhoods",
+            url: "/traffic-json/ltn",
+            fill: true,
+            color: '#beb71c'
+        },
+        improved: {
+            name: "Existing cycleways improved with Low Traffic Neighbourhood",
+            url: "/traffic-json/ltn",
+            fill: false,
+            color: '#1843bc'
+        },
+        lightseg: {
+            name: "Suggested lightly segregated cycle routes",
+            url: "/traffic-json/lightseg",
+            fill: false,
+            color: '#a81d1d'
+        },
+        wards: {
+            name: "Borough wards",
+            url: "/traffic-json/wards",
+            fill: true,
+            color: '#7e9cf2'
+        }
+    };
+
+    Object.keys(layers).forEach(function(layer_name){
+
+        var check = $('<div class="form-check"><input type="checkbox" class="layerswitch form-check-input" id="'+layer_name+'"><label class="form-check-label" for="'+layer_name+'">'+layers[layer_name]["name"]+'</label></div>');
+        $('#mapid').before(check);
+        layers[layer_name]["checkbox"] = $('#'+layer_name, check).change(function() {
+            if(this.checked) {
+                toggle_layer(layer_name, true);
+            } else {
+                toggle_layer(layer_name, false);
+            }
+        });
+    })
+
+    var toggle_layer = function (layer_name, show) {
+        if (show) {
+            if (!layers[layer_name]["leaflet"]) {
+                fetch('/traffic-json/' + layer_name)
+                    .then(function(response) { return response.json() })
+                    .then(function(json) {
+                        layers[layer_name]["leaflet"] = L.geoJSON(json, {
+
+                            style: function (feature) {
+                                return {
+                                    fill: layers[layer_name]["fill"],
+                                    color: layers[layer_name]["color"]
+                                };
+                            },
+                        }).addTo(mymap);
+                    });
+            } else {
+                layers[layer_name]["leaflet"].addTo(mymap);
+            }
+        } else {
+            layers[layer_name]["leaflet"].remove();
+        }
+    }
+
+    if (getUrlParameter('clwn')) {
+        toggle_layer('clwn', 1);
+        layers['clwn']["checkbox"].attr('checked', true);
+    }
+
+    if (getUrlParameter('improved')) {
+        toggle_layer('improved', 1);
+        layers['improved']["checkbox"].attr('checked', true);
+    }
+
+    if (getUrlParameter('lightseg')) {
+        toggle_layer('lightseg', 1);
+        layers['lightseg']["checkbox"].attr('checked', true);
+    }
+
+    if (getUrlParameter('ltn')) {
+        toggle_layer('ltn', 1);
+        layers['ltn']["checkbox"].attr('checked', true);
+    }
+
+    if (getUrlParameter('wards')) {
+        toggle_layer('wards', 1);
+        layers['wards']["checkbox"].attr('checked', true);
+    }
+}
