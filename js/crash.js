@@ -1,3 +1,18 @@
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+};
+
 var mymap = L.map('mapid').setView([51.505, -0.147], 15);
 
 
@@ -28,6 +43,101 @@ function onEachFeature(feature, layer) {
     });
 }
 
+var layers = {
+    clwn: {
+        name: "Central London Walking Network",
+        url: "/traffic-json/clwn",
+        fill: false,
+        color: '#0f702a'
+    },
+    ltn: {
+        name: "Suggested Low Traffic Neighbourhoods",
+        url: "/traffic-json/ltn",
+        fill: true,
+        color: '#beb71c'
+    },
+    improved: {
+        name: "Existing cycleways improved with Low Traffic Neighbourhood",
+        url: "/traffic-json/ltn",
+        fill: false,
+        color: '#1843bc'
+    },
+    lightseg: {
+        name: "Suggested lightly segregated cycle routes",
+        url: "/traffic-json/lightseg",
+        fill: false,
+        color: '#a81d1d'
+    },
+    wards: {
+        name: "Borough wards",
+        url: "/traffic-json/wards",
+        fill: true,
+        color: '#7e9cf2'
+    }
+};
+
+Object.keys(layers).forEach(function(layer_name){
+
+    var check = $('<div class="form-check"><input type="checkbox" class="layerswitch form-check-input" id="'+layer_name+'"><label class="form-check-label" for="'+layer_name+'">'+layers[layer_name]["name"]+'</label></div>');
+    $('#mapid').before(check);
+    layers[layer_name]["checkbox"] = $('#'+layer_name, check).change(function() {
+        if(this.checked) {
+            toggle_layer(layer_name, true);
+        } else {
+            toggle_layer(layer_name, false);
+        }
+    });
+})
+
+var toggle_layer = function (layer_name, show) {
+    if (show) {
+        if (!layers[layer_name]["leaflet"]) {
+            fetch('/traffic-json/' + layer_name)
+                .then(function(response) { return response.json() })
+                .then(function(json) {
+                    layers[layer_name]["leaflet"] = L.geoJSON(json, {
+
+                        style: function (feature) {
+                            return {
+                                fill: layers[layer_name]["fill"],
+                                color: layers[layer_name]["color"]
+                            };
+                        },
+                    }).addTo(mymap);
+                });
+        } else {
+            layers[layer_name]["leaflet"].addTo(mymap);
+        }
+    } else {
+        layers[layer_name]["leaflet"].remove();
+    }
+}
+
+if (getUrlParameter('clwn')) {
+    toggle_layer('clwn', 1);
+    layers['clwn']["checkbox"].attr('checked', true);
+}
+
+if (getUrlParameter('improved')) {
+    toggle_layer('improved', 1);
+    layers['improved']["checkbox"].attr('checked', true);
+}
+
+if (getUrlParameter('lightseg')) {
+    toggle_layer('lightseg', 1);
+    layers['lightseg']["checkbox"].attr('checked', true);
+}
+
+if (getUrlParameter('ltn')) {
+    toggle_layer('ltn', 1);
+    layers['ltn']["checkbox"].attr('checked', true);
+}
+
+if (getUrlParameter('wards')) {
+    toggle_layer('wards', 1);
+    layers['wards']["checkbox"].attr('checked', true);
+}
+
 var markers = L.markerClusterGroup({
 });
 
@@ -43,23 +153,41 @@ fetch("/traffic-json/points")
         });
         markers.addLayer(geoJsonLayer);
         mymap.addLayer(markers);
-        if (json.features.length) {
+        if (json.features.length && !getUrlParameter('ward')) {
             mymap.fitBounds(markers.getBounds());
         }
     });
 
-fetch("/traffic-json/outline")
-    .then(function(response) { return response.json() })
-    .then(function(json) {
-        var geoJsonLayer = L.geoJSON([json], {
+if (getUrlParameter('ward')) {
+    console.log(getUrlParameter('ward'));
+    fetch("/traffic-json/ward/" + getUrlParameter('ward'))
+	.then(function(response) { return response.json() })
+	.then(function(json) {
+	    var geoJsonLayer = L.geoJSON(json, {
 
-            style: function (feature) {
-                return {
-                    fill: false
-                };
-            },
-        }).addTo(mymap);
-    });
+		style: function (feature) {
+		    return {
+			fill: false
+		    };
+		},
+	    }).addTo(mymap);
+            mymap.fitBounds(geoJsonLayer.getBounds());
+	});
+
+} else {
+    fetch("/traffic-json/outline")
+	.then(function(response) { return response.json() })
+	.then(function(json) {
+	    var geoJsonLayer = L.geoJSON([json], {
+
+		style: function (feature) {
+		    return {
+			fill: false
+		    };
+		},
+	    }).addTo(mymap);
+	});
+}
 
 var subjects;
 fetch("/traffic-json/subjects")
