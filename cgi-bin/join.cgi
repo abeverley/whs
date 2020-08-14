@@ -32,7 +32,7 @@ _BODY
 
     #use Data::Dumper; say STDERR $query->get('submit');
     Mail::Message->build
-      ( To             => 'andy@andybev.com'
+      ( To             => 'info@westminsterstreets.org.uk'
       , From           => 'andy@andybev.com'
       , Subject        => "New member"
       , data           => $body
