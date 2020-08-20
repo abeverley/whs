@@ -237,8 +237,10 @@ $('#mapid').on('click', '.trigger', function(e) {
             $form.find('.alert').show();
         } else {
             $form.find('.error-message').text();
-            $popup.hide();
-            if (!$form.data('is-feedback')) {
+            if ($form.data('is-feedback')) {
+                $form.html('<div class="alert alert-success mt-2" role="alert">Thank you for your feedback</div>');
+            } else {
+                $popup.hide();
                 var mark = L.marker([$popup.find('.lat').val(), $popup.find('.long').val()]).addTo(mymap);
                 mark.bindPopup("Loading...").on('popupopen', function (e) {
                     marker_popup(e, point);
