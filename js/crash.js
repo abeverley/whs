@@ -38,6 +38,8 @@ function onEachFeature(feature, layer) {
             has_image:        feature.properties.has_image,
             html:             feature.properties.html,
             subject:          feature.properties.subject,
+            feedback:         feature.properties.feedback,
+            is_record:        feature.properties.is_record,
             thumbnail_width:  feature.properties.thumbnail_width,
             thumbnail_height: feature.properties.thumbnail_height
         };
@@ -109,36 +111,57 @@ fetch("/traffic-json/subjects")
 var popup = L.popup();
 
 function onMapClick(e) {
-        var content = '<h5>Add comment</h5>'
+        var content;
+        if (is_record) {
+            content = '<h5>Add point</h5>'
                 + '<form method="post">'
-                + '<input type="hidden" name="is_record" value="' + is_record + '">'
+                + '<input type="hidden" name="is_record" value="1">'
+                + '<input type="hidden" name="password" value="' + getUrlParameter('allow-edit') + '">'
+                + '<div class="form-group">'
+                + '<label for="comment">Title:</label>'
+                + '<input type="text" name="comment" class="form-control">'
+                + '</div>';
+        } else {
+            content = '<h5>Add comment</h5>'
+                + '<form method="post">'
                 + '<div class="form-group">'
                 + '<select class="form-control" id="subject_id" name="subject_id">'
                 + '<option value="" disabled selected>&lt;select category&gt;</option>';
-        subjects.forEach(function (item, index){
-            content = content + '<option value="' + item.id + '">' + item.title + '</option>';
-        });
-        content = content + '</select></div>'
-                + '<div class="form-group"><textarea name="comment" rows="5" class="form-control"></textarea></div>'
+                subjects.forEach(function (item, index){
+                    content = content + '<option value="' + item.id + '">' + item.title + '</option>';
+                });
+                content = content + '</select></div>';
+                content = content + '<div class="form-group"><textarea name="comment" rows="5" class="form-control"></textarea></div>';
+        }
+
+        content = content
                 + '<input class="lat" type="hidden" name="lat" value="' + e.latlng.lat + '">'
                 + '<input class="long" type="hidden" name="long" value="' + e.latlng.lng + '">'
                 + '<div class="form-group"><label for="photo">Photo (optional)</label><input type="file" name="file" class="form-control-file" id="photo"></div>'
                 + '<div class="alert alert-danger error-message" role="alert" style="display:none"></span></div>'
                 + '<div class="d-flex justify-content-end"><button type="submit" class="btn btn-primary trigger">Submit</button></div></form>';
+
         var pop = L.popup({minWidth: 300})
             .setLatLng(e.latlng)
             .setContent(content)
             .openOn(mymap);
 }
 
-if (is_record) { mymap.on('click', onMapClick); }
+if (is_record && getUrlParameter('allow-edit')) { mymap.on('click', onMapClick); }
 
 var marker_popup = function (e, point) {
     var popup = e.target.getPopup();
     popup.setContent(function(ef){
-        var $element = $('<div><p>'+point.html+'</p></div>');
-        if (point.subject) {
+        var $element = $('<div>'+point.html+'</div>');
+        if (point.subject && !point.is_record) {
             $element.prepend('<h6>' + point.subject + '</h6>');
+        }
+        if (point.is_record) {
+            var $feedback = $('<p style="margin:0 0 5px 0"></p>');
+            $feedback.append('&#x1f44d; ' + point.feedback.keep);
+            $feedback.append('<span style="margin-left:15px"></span>&#x1F610; ' + point.feedback.improve);
+            $feedback.append('<span style="margin-left:15px"></span>&#x1f44e; ' + point.feedback.remove);
+            $feedback.appendTo($element);
         }
         if (point.has_image) {
             $element.find('.loading').show();
@@ -151,6 +174,32 @@ var marker_popup = function (e, point) {
             $image.appendTo($image_link);
             $image_link.appendTo($element);
             $element.find('.loading').hide();
+        }
+
+        if (point.is_record) {
+            var $options = $('<form method="post" data-is-feedback="1">'
+                + '<input type="hidden" name="is_feedback" value="1">'
+                + '<input type="hidden" name="point_id" value="' + point.id + '">'
+                + '<label class="mt-2">Select an option:</label>'
+                + '<div class="btn-group-toggle" data-toggle="buttons">'
+                + '<label class="btn btn-success mb-2" style="width:100%">'
+                + '<input type="radio" name="feedback" value="keep" autocomplete="off"> Keep this as it is'
+                + '</label>'
+                + '<label class="btn btn-warning mb-2" style="width:100%">'
+                + '<input type="radio" name="feedback" value="improve" autocomplete="off"> Keep this but improve it'
+                + '</label>'
+                + '<label class="btn btn-danger mb-2" style="width:100%">'
+                + '<input type="radio" name="feedback" value="remove" autocomplete="off"> This does not improve healthy travel'
+                + '</label>'
+                + '</div>'
+                + '<div class="form-group">'
+                + '<label for="comment">Comments:</label>'
+                + '<input type="text" name="comment" class="form-control">'
+                + '</div>'
+                + '<div class="alert alert-danger error-message" role="alert" style="display:none"></span></div>'
+                + '<div class="d-flex justify-content-end"><button type="submit" class="btn btn-primary trigger">Submit</button></div>'
+                + '</form>');
+            $options.appendTo($element);
         }
         return $element.html();
     });
@@ -185,11 +234,12 @@ $('#mapid').on('click', '.trigger', function(e) {
         } else {
             $form.find('.error-message').text();
             $popup.hide();
-            var mark = L.marker([$popup.find('.lat').val(), $popup.find('.long').val()]).addTo(mymap);
-
-            mark.bindPopup("Loading...").on('popupopen', function (e) {
-                marker_popup(e, point);
-            });
+            if (!$form.data('is-feedback')) {
+                var mark = L.marker([$popup.find('.lat').val(), $popup.find('.long').val()]).addTo(mymap);
+                mark.bindPopup("Loading...").on('popupopen', function (e) {
+                    marker_popup(e, point);
+                });
+            }
         }
     }).fail(function(jqXHR) {
         $form.find('button').html('Submit').prop("disabled",false);
