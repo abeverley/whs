@@ -67,6 +67,11 @@ figcaption {
     height: auto;
 }
 
+.overlay-fill {
+    height:300px;
+    object-fit:cover;
+}
+
 .spinner, .overlay {
   grid-area: 1 / 1;
 }
