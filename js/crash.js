@@ -32,7 +32,11 @@ function onEachFeature(feature, layer) {
 
     var id = feature.properties.id;
 
-    layer.bindPopup("Loading...").on('popupopen', function (e) {
+    layer.bindPopup("Loading...", {
+        //minWidth : 300,
+        maxWidth : 'Math.floor(screen.width / 3)',
+        maxHeight: 'Math.floor(screen.height / 2)'
+    }).on('popupopen', function (e) {
         var point = {
             id:               feature.properties.id,
             has_image:        feature.properties.has_image,
@@ -157,22 +161,29 @@ var marker_popup = function (e, point) {
             $element.prepend('<h6>' + point.subject + '</h6>');
         }
         if (point.is_record) {
-            var $feedback = $('<p style="margin:0 0 5px 0"></p>');
+            var $feedback = $('<p style="margin:0 0 5px 0; font-size:14px"></p>');
             $feedback.append('&#x1f44d; ' + point.feedback.keep);
             $feedback.append('<span style="margin-left:15px"></span>&#x1F610; ' + point.feedback.improve);
             $feedback.append('<span style="margin-left:15px"></span>&#x1f44e; ' + point.feedback.remove);
+            $feedback.append('<span style="margin-left:50px"></span>ID ' + point.id);
             $feedback.appendTo($element);
         }
+        var $row = $('<div class="row"></div>');
         if (point.has_image) {
             $element.find('.loading').show();
             var $image_link = $('<a href="#" data-toggle="modal" data-target="#modal-image"></a>');
-            var $image = $('<div class="container"><div class="spinner"></div><img width="'
+            var $image = $('<div style="display:grid"><div class="spinner"></div><img width="'
                 + point.thumbnail_width + '" height="' + point.thumbnail_height
                 + '" class="overlay" data-point-id="'+ point.id +'"></div>');
+            if (point.is_record) {
+                $image.find('.overlay').addClass('overlay-fill');
+            }
             var $image2 = $image.find('.overlay');
             $image2.attr('src', '/traffic-json/thumbnail/' + point.id);
             $image.appendTo($image_link);
-            $image_link.appendTo($element);
+            var $col = $('<div class="col-sm-6" style="padding:0"></div>');
+            $image_link.appendTo($col);
+            $col.appendTo($row);
             $element.find('.loading').hide();
         }
 
@@ -180,16 +191,16 @@ var marker_popup = function (e, point) {
             var $options = $('<form method="post" data-is-feedback="1">'
                 + '<input type="hidden" name="is_feedback" value="1">'
                 + '<input type="hidden" name="point_id" value="' + point.id + '">'
-                + '<label class="mt-2">Select an option:</label>'
+                + '<h6>Select an option:</h6>'
                 + '<div class="btn-group-toggle" data-toggle="buttons">'
                 + '<label class="btn btn-success mb-2" style="width:100%">'
-                + '<input type="radio" name="feedback" value="keep" autocomplete="off"> Keep this as it is'
+                + '<input type="radio" name="feedback" value="keep" autocomplete="off"> Keep as is'
                 + '</label>'
                 + '<label class="btn btn-warning mb-2" style="width:100%">'
-                + '<input type="radio" name="feedback" value="improve" autocomplete="off"> Keep this but improve it'
+                + '<input type="radio" name="feedback" value="improve" autocomplete="off"> Keep but improve'
                 + '</label>'
                 + '<label class="btn btn-danger mb-2" style="width:100%">'
-                + '<input type="radio" name="feedback" value="remove" autocomplete="off"> This does not improve healthy travel'
+                + '<input type="radio" name="feedback" value="remove" autocomplete="off"> Not helping healthy streets'
                 + '</label>'
                 + '</div>'
                 + '<div class="form-group">'
@@ -203,8 +214,13 @@ var marker_popup = function (e, point) {
                 + '<div class="alert alert-danger error-message" role="alert" style="display:none"></span></div>'
                 + '<div class="d-flex justify-content-end"><button type="submit" class="btn btn-primary trigger">Submit</button></div>'
                 + '</form>');
-            $options.appendTo($element);
+            var $col = $('<div class="col-sm-6" style="padding:0 0 0 15px"></div>');
+            $options.appendTo($col);
+            $col.appendTo($row);
         }
+        var $container = $('<div class="container"></div>');
+        $row.appendTo($container);
+        $container.appendTo($element);
         return $element.html();
     });
     popup.update(); // Does nothing?
