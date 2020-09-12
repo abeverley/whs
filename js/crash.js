@@ -181,7 +181,7 @@ var marker_popup = function (e, point) {
             var $image2 = $image.find('.overlay');
             $image2.attr('src', '/traffic-json/thumbnail/' + point.id);
             $image.appendTo($image_link);
-            var $col = $('<div class="col-sm-6" style="padding:0"></div>');
+            var $col = $('<div class="col-lg-6" style="padding:0"></div>');
             $image_link.appendTo($col);
             $col.appendTo($row);
             $element.find('.loading').hide();
@@ -214,13 +214,31 @@ var marker_popup = function (e, point) {
                 + '<div class="alert alert-danger error-message" role="alert" style="display:none"></span></div>'
                 + '<div class="d-flex justify-content-end"><button type="submit" class="btn btn-primary trigger">Submit</button></div>'
                 + '</form>');
-            var $col = $('<div class="col-sm-6" style="padding:0 0 0 15px"></div>');
+            var $col = $('<div class="col-lg-6"></div>');
             $options.appendTo($col);
             $col.appendTo($row);
         }
         var $container = $('<div class="container"></div>');
         $row.appendTo($container);
         $container.appendTo($element);
+
+        //  Check if mobile to open a modal instead, otherwise the popup is too
+        //  small to complete (within the map)
+        if (typeof window.orientation !== 'undefined' || screen.width <= 480 ) {
+
+            // Empty previous modal
+            $('#modal-popup .modal-body').empty();
+
+            // Add popup data to modal
+            $element.appendTo($('#modal-popup .modal-body'));
+            $('#modal-popup').modal();
+
+            // Add on close event
+            $(document).on('hide.bs.modal','#modal-popup', function () {
+                $(".leaflet-popup-close-button")[0].click();
+            });
+        }
+
         return $element.html();
     });
     popup.update(); // Does nothing?
@@ -377,6 +395,7 @@ function setup_layers() {
     }
 }
 
+// Get popup width by screen size
 function getPopupWidth() {
     factor = 2;
     if(screen.width <= 400) {
@@ -385,6 +404,7 @@ function getPopupWidth() {
     return Math.floor(screen.width / factor);
 }
 
+// Get popup height by screen size
 function getPopupHeight() {
     factor = 2;
     if(screen.height <= 400) {
