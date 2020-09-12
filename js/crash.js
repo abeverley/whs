@@ -34,8 +34,8 @@ function onEachFeature(feature, layer) {
 
     layer.bindPopup("Loading...", {
         //minWidth : 300,
-        maxWidth : 'Math.floor(screen.width / 3)',
-        maxHeight: 'Math.floor(screen.height / 2)'
+        maxWidth : getPopupWidth(),
+        maxHeight: getPopupHeight()
     }).on('popupopen', function (e) {
         var point = {
             id:               feature.properties.id,
@@ -375,4 +375,20 @@ function setup_layers() {
         toggle_layer('wards', 1);
         layers['wards']["checkbox"].attr('checked', true);
     }
+}
+
+function getPopupWidth() {
+    factor = 2;
+    if(screen.width <= 400) {
+        factor = 1.3;
+    }
+    return Math.floor(screen.width / factor);
+}
+
+function getPopupHeight() {
+    factor = 2;
+    if(screen.height <= 400) {
+        factor = 1;
+    }
+    return Math.floor(screen.height / factor);
 }
