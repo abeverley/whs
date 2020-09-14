@@ -153,6 +153,46 @@ function onMapClick(e) {
 
 if (is_record && getUrlParameter('allow-edit')) { mymap.on('click', onMapClick); }
 
+var submit_feedback = function($form) {
+    $form.find('.alert').hide();
+    $form.find('button').html('Submitting...').prop("disabled",true);
+
+    var formdata = false;
+    if (window.FormData){
+        formdata = new FormData($form.get(0));
+    }
+
+    $.ajax({
+        url: '/traffic-json/submit',
+        data: formdata ? formdata : $form.serialize(),
+        cache: false,
+        contentType: false,
+        processData: false,
+        type: 'POST'
+    }).done(function(point) {
+        if (point.is_error) {
+            $form.find('button').html('Submit').prop("disabled",false);
+            $form.find('.error-message').text(point.message);
+            $form.find('.alert').show();
+        } else {
+            $form.find('.error-message').text();
+            if ($form.data('is-feedback')) {
+                $form.html('<div class="alert alert-success mt-2" role="alert">Thank you for your feedback</div>');
+            } else {
+                $popup.hide();
+                var mark = L.marker([$popup.find('.lat').val(), $popup.find('.long').val()]).addTo(mymap);
+                mark.bindPopup("Loading...").on('popupopen', function (e) {
+                    marker_popup(e, point);
+                });
+            }
+        }
+    }).fail(function(jqXHR) {
+        $form.find('button').html('Submit').prop("disabled",false);
+        $form.find('.error-message').text("Sorry, submission failed: " + jqXHR.statusText);
+        $form.find('.alert').show();
+    });
+};
+
 var marker_popup = function (e, point) {
     var popup = e.target.getPopup();
     popup.setContent(function(ef){
@@ -235,7 +275,14 @@ var marker_popup = function (e, point) {
 
             // Add on close event
             $(document).on('hide.bs.modal','#modal-popup', function () {
-                $(".leaflet-popup-close-button")[0].click();
+                mymap.closePopup();
+            });
+
+            $element.on('click', '.trigger', function(e) {
+                e.preventDefault();
+                var $form = $element.find('form');
+                console.log($form);
+                submit_feedback($form);
             });
         }
 
@@ -249,43 +296,7 @@ $('#mapid').on('click', '.trigger', function(e) {
     var $target = $( event.target );
     var $popup = $target.closest('.leaflet-popup');
     var $form = $popup.find('form');
-    $form.find('.alert').hide();
-    $form.find('button').html('Submitting...').prop("disabled",true);
-
-    var formdata = false;
-    if (window.FormData){
-        formdata = new FormData($form.get(0));
-    }
-
-    $.ajax({
-        url: '/traffic-json/submit',
-        data: formdata ? formdata : $form.serialize(),
-        cache: false,
-        contentType: false,
-        processData: false,
-        type: 'POST'
-    }).done(function(point) {
-        if (point.is_error) {
-            $form.find('button').html('Submit').prop("disabled",false);
-            $form.find('.error-message').text(point.message);
-            $form.find('.alert').show();
-        } else {
-            $form.find('.error-message').text();
-            if ($form.data('is-feedback')) {
-                $form.html('<div class="alert alert-success mt-2" role="alert">Thank you for your feedback</div>');
-            } else {
-                $popup.hide();
-                var mark = L.marker([$popup.find('.lat').val(), $popup.find('.long').val()]).addTo(mymap);
-                mark.bindPopup("Loading...").on('popupopen', function (e) {
-                    marker_popup(e, point);
-                });
-            }
-        }
-    }).fail(function(jqXHR) {
-        $form.find('button').html('Submit').prop("disabled",false);
-        $form.find('.error-message').text("Sorry, submission failed: " + jqXHR.statusText);
-        $form.find('.alert').show();
-    });
+    submit_feedback($form);
 });
 
 $('#modal-image').on('show.bs.modal', function (event) {
