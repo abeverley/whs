@@ -224,7 +224,7 @@ var marker_popup = function (e, point) {
 
         //  Check if mobile to open a modal instead, otherwise the popup is too
         //  small to complete (within the map)
-        if (typeof window.orientation !== 'undefined' || screen.width <= 480 ) {
+        if (typeof window.orientation !== 'undefined' || screen.width <= 480 || screen.height < 480) {
 
             // Empty previous modal
             $('#modal-popup .modal-body').empty();
