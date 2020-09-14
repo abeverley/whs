@@ -75,7 +75,6 @@ fetch("/traffic-json/points?is_record=" + is_record)
     });
 
 if (getUrlParameter('ward')) {
-    console.log(getUrlParameter('ward'));
     fetch("/traffic-json/ward/" + getUrlParameter('ward'))
 	.then(function(response) { return response.json() })
 	.then(function(json) {
@@ -281,7 +280,6 @@ var marker_popup = function (e, point) {
             $element.on('click', '.trigger', function(e) {
                 e.preventDefault();
                 var $form = $element.find('form');
-                console.log($form);
                 submit_feedback($form);
             });
         }
