@@ -178,6 +178,7 @@ var submit_feedback = function($form) {
             if ($form.data('is-feedback')) {
                 $form.html('<div class="alert alert-success mt-2" role="alert">Thank you for your feedback</div>');
             } else {
+                var $popup = $form.closest('.leaflet-popup');
                 $popup.hide();
                 var mark = L.marker([$popup.find('.lat').val(), $popup.find('.long').val()]).addTo(mymap);
                 mark.bindPopup("Loading...").on('popupopen', function (e) {
