@@ -239,7 +239,7 @@ var marker_popup = function (e, point) {
                 + '<input type="radio" name="feedback" value="improve" autocomplete="off"> Keep but improve'
                 + '</label>'
                 + '<label class="btn btn-danger mb-2" style="width:100%">'
-                + '<input type="radio" name="feedback" value="remove" autocomplete="off"> Not helping healthy streets'
+                + '<input type="radio" name="feedback" value="remove" autocomplete="off"> Doesn&rsquo;t help healthy streets'
                 + '</label>'
                 + '</div>'
                 + '<div class="form-group">'
