@@ -339,6 +339,7 @@ module.exports = function(config) {
   });
 
   // Get all authors
+  /*
   config.addCollection("authors", async function(collection) {
     collection = await api.authors
       .browse({
@@ -370,7 +371,7 @@ module.exports = function(config) {
     });
 
     return collection;
-  });
+  }); */
 
   // Get all tags
   config.addCollection("tags", async function(collection) {
@@ -408,6 +409,7 @@ module.exports = function(config) {
   });
 
   // Display 404 page in BrowserSnyc
+  /*
   config.setBrowserSyncConfig({
     callbacks: {
       ready: (err, bs) => {
@@ -420,7 +422,7 @@ module.exports = function(config) {
         });
       }
     }
-  });
+  }); */
 
   // Eleventy configuration
   return {
