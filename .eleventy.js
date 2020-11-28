@@ -116,7 +116,12 @@ module.exports = function(config) {
     });
 
     // Bring featured post to the top of the list
-    collection.sort((post, nextPost) => nextPost.featured - post.featured);
+    collection.sort(function(post, nextPost) {
+        if (nextPost.featured == post.featured) {
+            return nextPost.published_at - post.published_at;
+        }
+        return nextPost.featured - post.featured;
+    });
 
     return collection;
   });
