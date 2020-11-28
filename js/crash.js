@@ -14,6 +14,7 @@ var getUrlParameter = function getUrlParameter(sParam) {
 };
 
 var is_record = window.location.href.search("westminster-temporary-traffic-measures") > 0;
+var is_pp = window.location.href.search("have-your-say-on-paddington-places") > 0 ? 1 : 0;
 
 var mymap = L.map('mapid').setView([51.505, -0.147], 15);
 
@@ -51,13 +52,13 @@ function onEachFeature(feature, layer) {
     });
 }
 
-if (!is_record) { setup_layers(); }
+if (!is_record && !is_pp) { setup_layers(); }
 
 
 var markers = L.markerClusterGroup({
 });
 
-fetch("/traffic-json/points?is_record=" + is_record)
+fetch("/traffic-json/points?is_record=" + is_record + "&is_pp=" + is_pp)
     .then(function(response) { return response.json() })
     .then(function(json) {
         var geoJsonLayer = L.geoJSON([json], {
@@ -90,7 +91,7 @@ if (getUrlParameter('ward')) {
 	});
 
 } else {
-    fetch("/traffic-json/outline")
+    fetch("/traffic-json/outline?is_pp=" + is_pp)
 	.then(function(response) { return response.json() })
 	.then(function(json) {
 	    var geoJsonLayer = L.geoJSON([json], {
@@ -105,7 +106,7 @@ if (getUrlParameter('ward')) {
 }
 
 var subjects;
-fetch("/traffic-json/subjects")
+fetch("/traffic-json/subjects?is_pp=" + is_pp)
     .then(function(response) { return response.json() })
     .then(function(json) {
         subjects = json;
@@ -127,6 +128,7 @@ function onMapClick(e) {
         } else {
             content = '<h5>Add comment</h5>'
                 + '<form method="post">'
+                + '<input type="hidden" name="is_pp" value="' + is_pp + '">'
                 + '<div class="form-group">'
                 + '<select class="form-control" id="subject_id" name="subject_id">'
                 + '<option value="" disabled selected>&lt;select category&gt;</option>';
@@ -134,6 +136,11 @@ function onMapClick(e) {
                     content = content + '<option value="' + item.id + '">' + item.title + '</option>';
                 });
                 content = content + '</select></div>';
+                if (is_pp) {
+                    content = content + '<div class="form-group">';
+                    content = content + '<input type="text" name="postcode" class="form-control" placeholder="Your postcode">';
+                    content = content + '</div>';
+                }
                 content = content + '<div class="form-group"><textarea name="comment" rows="5" class="form-control"></textarea></div>';
         }
 
@@ -150,7 +157,7 @@ function onMapClick(e) {
             .openOn(mymap);
 }
 
-if (is_record && getUrlParameter('allow-edit')) { mymap.on('click', onMapClick); }
+if (is_pp || (is_record && getUrlParameter('allow-edit'))) { mymap.on('click', onMapClick); }
 
 var submit_feedback = function($form) {
     $form.find('.alert').hide();
@@ -205,7 +212,7 @@ var marker_popup = function (e, point) {
             $feedback.append('&#x1f44d; ' + point.feedback.keep);
             $feedback.append('<span style="margin-left:15px"></span>&#x1F610; ' + point.feedback.improve);
             $feedback.append('<span style="margin-left:15px"></span>&#x1f44e; ' + point.feedback.remove);
-            $feedback.append('<span style="margin-left:50px"></span>ID ' + point.id);
+            //$feedback.append('<span style="margin-left:50px"></span>ID ' + point.id);
             $feedback.appendTo($element);
         }
         var $row = $('<div class="row"></div>');
