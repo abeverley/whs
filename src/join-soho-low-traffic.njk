@@ -1,0 +1,58 @@
+{% extends 'layouts/default.njk' %}
+
+{% set title = "Join Soho Low Traffic" %}
+
+{% block content %}
+
+    <div class="row justify-content-center">
+<div class="col-lg-9">
+      <h1 class="mt-3">Join our Soho low traffic group</h1>
+    <!-- Example row of columns -->
+
+        <p class="lead">
+            Do you want to see Soho with less traffic? Join our Soho group!
+        </p>
+    <form id="join-form">
+  <div class="form-group">
+    <label for="soho-connection">Connection to Soho:</label>
+    <select class="form-control" id="soho-connection" name="soho-connection">
+      <option></option>
+      <option value="resident">I live in Soho</option>
+      <option value="work">I work in Soho</option>
+      <option value="school">My children go to school in Soho</option>
+      <option value="love">I just love Soho</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="forename">First name:</label>
+    <input type="text" class="form-control" id="forename" name="forename" placeholder="Enter first name">
+  </div>
+  <div class="form-group">
+    <label for="surname">Surname:</label>
+    <input type="text" class="form-control" id="surname" name="surname" placeholder="Enter surname">
+  </div>
+  <div class="form-group">
+    <label for="email">Email address:</label>
+    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
+  </div>
+  <div class="form-group">
+    <label for="postcode">Postcode:</label>
+    <input type="text" class="form-control" id="postcode" name="postcode" aria-describedby="postcode-help" placeholder="Enter postcode">
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="" id="permission">
+    <label class="form-check-label" for="permission">
+      I agree for Westminster Healthy Streets to use my contact details to keep me updated with meetings, campaigns and relevant news. I understand that I can unsubscribe from this at any point through emailing info@westminsterstreets.org.uk. <a href="/privacy-policy" target="_blank">View our Privacy Policy</a>.
+    </label>
+  </div>
+<div class="alert alert-danger" id="form-error" style="display:none">
+</div>
+<div class="alert alert-success" id="thanks" style="display:none">
+    Thanks, we'll be in touch!
+</div>
+  <button type="submit" class="btn btn-primary my-2" id="form-submit">Submit</button>
+</form>
+</div>
+</div>
+
+{% endblock%}
