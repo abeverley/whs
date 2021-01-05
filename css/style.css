@@ -80,8 +80,10 @@ figcaption {
   grid-area: 1 / 1;
 }
 
-
-
+.alignwide {
+    margin-left: calc(50% - 45vw);
+    width: 90vw;
+}
 
 .spinner {
    left: 50%;
