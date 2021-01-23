@@ -203,7 +203,7 @@ var submit_feedback = function($form) {
 var marker_popup = function (e, point) {
     var popup = e.target.getPopup();
     popup.setContent(function(ef){
-        var $element = $('<div>'+point.html+'</div>');
+        var $element = $('<div>'+point.html+' ('+point.id+')</div>');
         if (point.subject && !point.is_record) {
             $element.prepend('<h6>' + point.subject + '</h6>');
         }
