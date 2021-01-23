@@ -16,12 +16,29 @@ my $app = sub {
     my $req = Plack::Request->new( shift );
     my $query     = $req->body_parameters;
 
-    my $forename = $query->get('forename');
-    my $surname  = $query->get('surname');
-    my $email    = $query->get('email');
-    my $postcode = $query->get('postcode');
+    my $forename        = $query->get('forename');
+    my $surname         = $query->get('surname');
+    my $email           = $query->get('email');
+    my $postcode        = $query->get('postcode');
+    my $soho_connection = $query->get('soho-connection');
+    my $join_type       = $query->get('join-type') || '';
 
-    my $body = << "_BODY";
+    my $body;
+
+    if ($join_type eq 'soho')
+    {
+        $body = << "_BODY";
+A new member has joined Low Traffic Soho
+
+Surname: $surname
+Forename: $forename
+Email: $email
+Postcode: $postcode
+Connection: $soho_connection
+_BODY
+    }
+    else {
+        $body = << "_BODY";
 A new member has joined:
 
 Surname: $surname
@@ -29,12 +46,13 @@ Forename: $forename
 Email: $email
 Postcode: $postcode
 _BODY
+    }
 
     #use Data::Dumper; say STDERR $query->get('submit');
     Mail::Message->build
       ( To             => 'info@westminsterstreets.org.uk'
       , From           => 'andy@andybev.com'
-      , Subject        => "New member"
+      , Subject        => $join_type eq 'soho' ? "New Soho member" : "New member"
       , data           => $body
       )->send(via => 'postfix');
 
