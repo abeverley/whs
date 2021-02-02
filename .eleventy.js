@@ -26,6 +26,7 @@ module.exports = function(config) {
 
   // Copy `img/` to `_site/img`
   config.addPassthroughCopy("images");
+  config.addPassthroughCopy("static");
   config.addPassthroughCopy("js");
   config.addPassthroughCopy("css");
   config.addPassthroughCopy("cgi-bin");
