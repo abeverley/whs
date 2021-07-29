@@ -15,6 +15,8 @@ var getUrlParameter = function getUrlParameter(sParam) {
 
 var is_record = window.location.href.search("westminster-temporary-traffic-measures") > 0;
 var is_pp = window.location.href.search("have-your-say-on-paddington-places") > 0 ? 1 : 0;
+// Now URL updated to show results without feedback
+var is_results = window.location.href.search("westminster-temporary-traffic-measures") > 0;
 
 var mymap = L.map('mapid').setView([51.505, -0.147], 15);
 
@@ -58,7 +60,7 @@ if (!is_record && !is_pp) { setup_layers(); }
 var markers = L.markerClusterGroup({
 });
 
-fetch("/traffic-json/points?is_record=" + is_record + "&is_pp=" + is_pp)
+fetch("/traffic-json/points?is_record=" + is_record + "&is_pp=" + is_pp + "&is_results=" + is_results)
     .then(function(response) { return response.json() })
     .then(function(json) {
         var geoJsonLayer = L.geoJSON([json], {
@@ -203,11 +205,19 @@ var submit_feedback = function($form) {
 var marker_popup = function (e, point) {
     var popup = e.target.getPopup();
     popup.setContent(function(ef){
-        var $element = $('<div>'+point.html+' ('+point.id+')</div>');
+
+        var $element = $('<div>'+point.html+'</div>');
         if (point.subject && !point.is_record) {
             $element.prepend('<h6>' + point.subject + '</h6>');
         }
-        if (point.is_record) {
+        if (is_results) {
+            // Nothing yet
+            var $feedback = $('<p style="font-size:18px"></p>');
+            $feedback.append('<span class="text-success">Keep this: <strong>' + point.feedback.keep_p + '%</strong></span>');
+            $feedback.append('<span class="text-warning ml-5">Improve this: <strong>' + point.feedback.improve_p + '%</strong></span>');
+            $feedback.append('<span class="text-danger ml-5">Does not help: <strong>' + point.feedback.remove_p + '%</strong></span>');
+            $feedback.appendTo($element);
+        } else if (point.is_record) {
             var $feedback = $('<p style="margin:0 0 5px 0; font-size:14px"></p>');
             $feedback.append('&#x1f44d; ' + point.feedback.keep);
             $feedback.append('<span style="margin-left:15px"></span>&#x1F610; ' + point.feedback.improve);
@@ -234,7 +244,23 @@ var marker_popup = function (e, point) {
             $element.find('.loading').hide();
         }
 
-        if (point.is_record) {
+        if (is_results) {
+            var data = $.ajax({
+                type: "GET",
+                url: "/traffic-json/point/" + point.id,
+                async: false
+            }).responseText;
+            data = jQuery.parseJSON(data);
+
+            var $comments = $('<dl class="row"></dl>');
+            $.each(data.comments, function(index, value) {
+                $comments.append('<dt class="col-sm-3">'+value.postcode+'</dt><dd class="col-sm-9">'+value.comment+'</dd>');
+            });
+            var $col = $('<div class="col-lg-6"></div>');
+            $comments.appendTo($col);
+            $col.appendTo($row);
+        }
+        else if (point.is_record) {
             var $options = $('<form method="post" data-is-feedback="1">'
                 + '<input type="hidden" name="is_feedback" value="1">'
                 + '<input type="hidden" name="point_id" value="' + point.id + '">'
