@@ -20,6 +20,7 @@ var is_results = window.location.href.search("westminster-temporary-traffic-meas
 
 var mymap = L.map('mapid').setView([51.505, -0.147], 15);
 
+$('#mapid').append('<div id="loading-div" class="centered-overlay"><div class="loader"></div></div>');
 
 L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYWJldmVybGV5IiwiYSI6ImNrMm9qMTNieDB4OHAzYm56ZjNqaDY1ZjYifQ.8f0Lz6dUbO3R1eNzuJPeTg', {
     tileSize: 512,
@@ -245,6 +246,7 @@ var marker_popup = function (e, point) {
         }
 
         if (is_results) {
+            $('#loading-div').show();
             var data = $.ajax({
                 type: "GET",
                 url: "/traffic-json/point/" + point.id,
@@ -259,6 +261,7 @@ var marker_popup = function (e, point) {
             var $col = $('<div class="col-lg-6"></div>');
             $comments.appendTo($col);
             $col.appendTo($row);
+            $('#loading-div').hide();
         }
         else if (point.is_record) {
             var $options = $('<form method="post" data-is-feedback="1">'
@@ -320,7 +323,7 @@ var marker_popup = function (e, point) {
 
         return $element.html();
     });
-    popup.update(); // Does nothing?
+    //popup.update(); // Does nothing?
 };
 
 $('#mapid').on('click', '.trigger', function(e) {
