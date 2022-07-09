@@ -114,6 +114,7 @@ module.exports = function(config) {
 
       // Convert publish date into a Date object
       post.published_at = new Date(post.published_at);
+      post.date = new Date(post.published_at);
     });
 
     // Bring featured post to the top of the list
