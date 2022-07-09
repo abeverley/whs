@@ -14,11 +14,11 @@ var getUrlParameter = function getUrlParameter(sParam) {
 };
 
 var is_record = window.location.href.search("westminster-temporary-traffic-measures") > 0
-    || window.location.href.search("your-feedback-on-temporary") > 0;
+    || window.location.href.search("huge-support-for-westminsters-street-changes") > 0;
 var is_pp = window.location.href.search("have-your-say-on-paddington-places") > 0 ? 1 : 0;
 // Now URL updated to show results without feedback
 var is_results = window.location.href.search("westminster-temporary-traffic-measures") > 0
-    || window.location.href.search("your-feedback-on-temporary") > 0;
+    || window.location.href.search("huge-support-for-westminsters-street-changes") > 0;
 
 var mymap = L.map('mapid').setView([51.505, -0.147], 15);
 
